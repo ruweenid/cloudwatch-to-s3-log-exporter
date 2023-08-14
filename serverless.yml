@@ -1,0 +1,47 @@
+service: cloudwatch-to-s3-log-exporter
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.11
+  region: eu-west-2
+  stage: dev
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action: 
+            - 's3:*'
+            - 'cloudwatch:*'
+            - 'logs:*'
+            - 'lambda:*'
+            - 'ssm:*'
+          Resource: '*'
+  vpc:
+    securityGroupIds:
+      - ${ssm:/velaris/${self:provider.stage}/default-lambda-security-group}
+    subnetIds:
+      - ${ssm:PrivateSubnet2a}
+
+resources:
+  Resources:
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${opt:stage}-velaris-cloudwatch-logs-archive-bucket
+functions:
+  lambda:
+    handler: lambda_function.lambda_handler
+    events:
+      - schedule: 
+          rate: cron(0 0 * * ? *)
+          enabled: true
+    environment:
+      S3_BUCKET_NAME:
+        Ref: S3Bucket
+      STAGE: ${self:provider.stage}
+      MAX_WORKERS: 40
+    timeout: 600
+    memorySize: 512
+    ephemeralStorageSize: 1024
