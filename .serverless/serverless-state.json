@@ -216,7 +216,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/cloudwatch-to-s3-log-exporter/dev/1691992433238-2023-08-14T05:53:53.238Z/cloudwatch-to-s3-log-exporter.zip"
+                "S3Key": "serverless/cloudwatch-to-s3-log-exporter/dev/1692175359209-2023-08-16T08:42:39.209Z/cloudwatch-to-s3-log-exporter.zip"
               },
               "Handler": "lambda_function.lambda_handler",
               "Runtime": "python3.11",
@@ -254,14 +254,14 @@
               "LambdaLogGroup"
             ]
           },
-          "LambdaLambdaVersion9RvAUDJbMkViIAONdOgbW16K0jZrZpeGOSaQRll6sI": {
+          "LambdaLambdaVersionKHi7mXZBlYbFEGCaWMng8VXPHjgAVwtTE2z22ejj4": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "LambdaLambdaFunction"
               },
-              "CodeSha256": "94InZSoEeMWLjYdKWOlbPhTUVFFQbs7xqDMeKIC/20s="
+              "CodeSha256": "e2zYejb7o8/yBUbFzGL1+gwTUXINtKDauWwkiq/AR38="
             }
           },
           "LambdaEventsRuleSchedule1": {
@@ -320,7 +320,7 @@
           "LambdaLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "LambdaLambdaVersion9RvAUDJbMkViIAONdOgbW16K0jZrZpeGOSaQRll6sI"
+              "Ref": "LambdaLambdaVersionKHi7mXZBlYbFEGCaWMng8VXPHjgAVwtTE2z22ejj4"
             },
             "Export": {
               "Name": "sls-cloudwatch-to-s3-log-exporter-dev-LambdaLambdaFunctionQualifiedArn"
@@ -440,7 +440,7 @@
         "memory": 512,
         "runtime": "python3.11",
         "vpc": {},
-        "versionLogicalId": "LambdaLambdaVersion9RvAUDJbMkViIAONdOgbW16K0jZrZpeGOSaQRll6sI"
+        "versionLogicalId": "LambdaLambdaVersionKHi7mXZBlYbFEGCaWMng8VXPHjgAVwtTE2z22ejj4"
       }
     },
     "resources": {
@@ -471,10 +471,10 @@
     },
     "layers": {},
     "isDashboardMonitoringPreconfigured": false,
-    "artifact": "/home/ruween/cloudwatch-to-s3-log-exporter/.serverless/cloudwatch-to-s3-log-exporter.zip"
+    "artifact": "/home/ruween/testing/cloudwatch-to-s3-log-exporter/.serverless/cloudwatch-to-s3-log-exporter.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/cloudwatch-to-s3-log-exporter/dev/1691992433238-2023-08-14T05:53:53.238Z",
+    "artifactDirectoryName": "serverless/cloudwatch-to-s3-log-exporter/dev/1692175359209-2023-08-16T08:42:39.209Z",
     "artifact": "cloudwatch-to-s3-log-exporter.zip"
   }
 }

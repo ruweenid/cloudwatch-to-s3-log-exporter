@@ -3,6 +3,7 @@ import datetime
 import re
 import concurrent.futures
 import os
+import zipfile
 
 class LogExporter:
     def __init__(self):
@@ -34,33 +35,39 @@ class LogExporter:
             descending=True
         )['logStreams']
 
-        for log_stream in log_streams:
-            log_stream_name = log_stream['logStreamName']
-            clean_log_stream_name = self.clean_for_filename(log_stream_name)
+        log_group_folder = self.clean_for_filename(log_group)
+        start_date_folder = datetime.datetime.now().strftime('%Y-%m-%d')
+        zip_file_name = f"{log_group_folder}_{start_date_folder}.zip"
+        zip_file_path = f"/tmp/{zip_file_name}"
 
-            end_time = datetime.datetime.now()
-            start_time = end_time - datetime.timedelta(days=1)
+        with zipfile.ZipFile(zip_file_path, 'w') as zipf:
+            for log_stream in log_streams:
+                log_stream_name = log_stream['logStreamName']
+                clean_log_stream_name = self.clean_for_filename(log_stream_name)
 
-            response = self.cloudwatch_logs.get_log_events(
-                logGroupName=log_group,
-                logStreamName=log_stream_name,
-                startTime=int(start_time.timestamp()) * 1000,
-                endTime=int(end_time.timestamp()) * 1000
-            )
+                end_time = datetime.datetime.now()
+                start_time = end_time - datetime.timedelta(days=1)
 
-            log_events = response['events']
+                response = self.cloudwatch_logs.get_log_events(
+                    logGroupName=log_group,
+                    logStreamName=log_stream_name,
+                    startTime=int(start_time.timestamp()) * 1000,
+                    endTime=int(end_time.timestamp()) * 1000
+                )
 
-            if log_events:
-                log_group_folder = self.clean_for_filename(log_group)
-                start_date_folder = start_time.strftime('%Y-%m-%d')
-                log_file_name = f"{clean_log_stream_name}-{start_time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
-                log_file_path = f"/tmp/{log_file_name}"
+                log_events = response['events']
 
-                with open(log_file_path, 'w') as log_file:
-                    for event in log_events:
-                        log_file.write(event['message'] + '\n')
+                if log_events:
+                    log_file_name = f"{clean_log_stream_name}-{start_time.strftime('%Y-%m-%d-%H-%M-%S')}.log"
+                    log_file_path = f"/tmp/{log_file_name}"
 
-                self.upload_to_s3(log_file_path, log_group_folder, start_date_folder, log_file_name)
+                    with open(log_file_path, 'w') as log_file:
+                        for event in log_events:
+                            log_file.write(event['message'] + '\n')
+                    
+                    zipf.write(log_file_path, os.path.join(log_group_folder, start_date_folder, log_file_name))
+
+        self.upload_to_s3(zip_file_path, log_group_folder, start_date_folder, zip_file_name)
 
     @staticmethod
     def clean_for_filename(text):
@@ -70,7 +77,8 @@ class LogExporter:
         self.s3.upload_file(
             file_path,
             self.s3_bucket,
-            f"{log_group_folder}/{start_date_folder}/{file_name}"
+            f"{log_group_folder}/{start_date_folder}/{file_name}",
+            ExtraArgs={'StorageClass': 'ONEZONE_IA'}
         )
     
     def cleanup_temp_files(self):
